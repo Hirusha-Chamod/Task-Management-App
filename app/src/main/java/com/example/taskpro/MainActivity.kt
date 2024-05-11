@@ -11,11 +11,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import com.example.taskpro.adapters.TaskRecyclerViewAdapter
 import com.example.taskpro.databinding.ActivityMainBinding
+import com.example.taskpro.models.Task
+import com.example.taskpro.utils.Status
+import com.example.taskpro.utils.clearEditText
+import com.example.taskpro.utils.longToastShow
 import com.example.taskpro.utils.setupDialog
 import com.example.taskpro.utils.validateEditText
+import com.example.taskpro.viewmodels.TaskViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.Date
+import java.util.UUID
 
 class MainActivity : AppCompatActivity() {
 
@@ -41,19 +53,42 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private val taskViewModel: TaskViewModel by lazy {
+        ViewModelProvider(this)[TaskViewModel::class.java]
+    }
+
+    private val taskRecyclerViewAdapter:TaskRecyclerViewAdapter by lazy{
+            TaskRecyclerViewAdapter(){position, task ->
+                taskViewModel.deleteTask(task).observe(this){
+                    when(it.status){
+                        Status.LOADING->{
+                            loadingDialog.show()
+                        }
+                        Status.SUCCESS->{
+                            loadingDialog.dismiss()
+                            if(it.data !=-1){
+                                longToastShow("Task deleted")
+                            }
+
+                        }
+
+                        Status.ERROR -> {
+                            loadingDialog.dismiss()
+
+                        }
+                    }
+
+                }
+            }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
         enableEdgeToEdge()
-                ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
-
-
+        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
 
         // Add task start
         val addCloseImg = addTaskDialog.findViewById<ImageView>(R.id.closeImg)
@@ -86,6 +121,8 @@ class MainActivity : AppCompatActivity() {
 
 
         mainBinding.addTaskFABtn.setOnClickListener{
+            clearEditText(addETTitle, addETTitleL)
+            clearEditText(addETDesc, addETDescL)
             addTaskDialog.show()
         }
         val saveTaskBtn = addTaskDialog.findViewById<Button>(R.id.saveTaskBtn)
@@ -94,8 +131,31 @@ class MainActivity : AppCompatActivity() {
                 && validateEditText(addETDesc, addETDescL)
             ) {
                 addTaskDialog.dismiss()
-               Toast.makeText(this,"Task Added",Toast.LENGTH_SHORT).show()
-                loadingDialog.show()
+               val newTask = Task(
+                UUID.randomUUID().toString().trim(),
+                addETTitle.text.toString().trim(),
+                addETDesc.text.toString().trim(),
+                Date()
+               )
+                taskViewModel.insertTask(newTask).observe(this){
+                     when(it.status){
+                         Status.LOADING->{
+                             loadingDialog.show()
+                         }
+                         Status.SUCCESS->{
+                             loadingDialog.dismiss()
+                             if(it.data?.toInt()!=-1){
+                                 longToastShow("Task added")
+                                 }
+
+                         }
+
+                         Status.ERROR -> {
+                             loadingDialog.dismiss()
+
+                         }
+                         }
+                     }
             }
         }
 
@@ -144,5 +204,34 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        callGetTaskList()
+
+
     }
+
+
+    private fun callGetTaskList(){
+        CoroutineScope(Dispatchers.Main).launch{
+        taskViewModel.getTaskList().collect{
+            when(it.status){
+                Status.LOADING->{
+                    loadingDialog.show()
+                }
+                Status.SUCCESS->{
+                    it.data?.collect{taskList->
+                        loadingDialog.dismiss()
+                        taskRecyclerViewAdapter.addAllTask(taskList)
+                    }
+
+                }
+
+                Status.ERROR -> {
+                    loadingDialog.dismiss()
+
+                }
+            }
+        }
+        }
+
+        }
 }

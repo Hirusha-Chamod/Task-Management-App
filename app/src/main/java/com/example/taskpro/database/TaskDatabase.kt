@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.taskpro.converters.TypeConverter
+import com.example.taskpro.dao.TaskDao
 import com.example.taskpro.models.Task
 
 @Database(
@@ -17,6 +18,7 @@ import com.example.taskpro.models.Task
 abstract class TaskDatabase : RoomDatabase() {
 
 
+    abstract val taskDao: TaskDao
 
     companion object {
         @Volatile
