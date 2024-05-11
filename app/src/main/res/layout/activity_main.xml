@@ -5,15 +5,59 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/mainBackground">
 
-    <TextView
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:orientation="vertical">
+
+      <TextView
+          android:id="@+id/textView"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:text="Welcome Back"
+          android:textSize="24sp"
+          android:textStyle="bold"/>
+
+      <TextView
+          android:id="@+id/textView1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:text="Today's Task"
+          android:textSize="24sp"
+          android:textStyle="bold"/>
+
+      <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/taskRV"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:clipToPadding="false"
+          android:orientation="vertical"
+          android:paddingBottom="100dp"
+          app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+          tools:listitem="@layout/view_task_layout"/>
+
+
+
+
+  </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+       android:id="@+id/addTaskFABtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/white"
+        android:text="Add Task"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:icon="@drawable/addbtn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
