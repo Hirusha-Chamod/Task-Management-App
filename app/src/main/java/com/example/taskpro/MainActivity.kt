@@ -57,30 +57,7 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this)[TaskViewModel::class.java]
     }
 
-    private val taskRecyclerViewAdapter:TaskRecyclerViewAdapter by lazy{
-            TaskRecyclerViewAdapter(){position, task ->
-                taskViewModel.deleteTask(task).observe(this){
-                    when(it.status){
-                        Status.LOADING->{
-                            loadingDialog.show()
-                        }
-                        Status.SUCCESS->{
-                            loadingDialog.dismiss()
-                            if(it.data !=-1){
-                                longToastShow("Task deleted")
-                            }
 
-                        }
-
-                        Status.ERROR -> {
-                            loadingDialog.dismiss()
-
-                        }
-                    }
-
-                }
-            }
-    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -88,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(mainBinding.root)
         enableEdgeToEdge()
 
-        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
+
 
         // Add task start
         val addCloseImg = addTaskDialog.findViewById<ImageView>(R.id.closeImg)
@@ -194,23 +171,86 @@ class MainActivity : AppCompatActivity() {
         val updateTaskBtn = updateTaskDialog.findViewById<Button>(R.id.updateTaskBtn)
 
 
-        updateTaskBtn.setOnClickListener {
-            if (validateEditText(addETTitle, addETTitleL)
-                && validateEditText(addETDesc, addETDescL)
-            ) {
-                updateTaskDialog.dismiss()
-                Toast.makeText(this,"Task Added",Toast.LENGTH_SHORT).show()
-                loadingDialog.show()
+
+       val taskRecyclerViewAdapter = TaskRecyclerViewAdapter(){type,position, task ->
+           if (type =="delete"){
+            taskViewModel.deleteTask(task).observe(this){
+                when(it.status){
+                    Status.LOADING->{
+                        loadingDialog.show()
+                    }
+                    Status.SUCCESS->{
+                        loadingDialog.dismiss()
+                        if(it.data !=-1){
+                            longToastShow("Task deleted")
+                        }
+
+                    }
+
+                    Status.ERROR -> {
+                        loadingDialog.dismiss()
+
+                    }
+                }
+
             }
+           }else if (type == "update") {
+               updateETTitle.setText(task.title)
+               updateETDesc.setText(task.description)
+               updateTaskBtn.setOnClickListener {
+                   if (validateEditText(updateETTitle, updateETTitleL)
+                       && validateEditText(updateETDesc, updateETDescL)
+                   ) {
+                       val updateTask = Task(
+                           task.id,
+                           updateETTitle.text.toString().trim(),
+                           updateETDesc.text.toString().trim(),
+//                           here i Date updated
+                           Date()
+                       )
+                       updateTaskDialog.dismiss()
+                       loadingDialog.show()
+                       taskViewModel
+
+                           .updateTaskPaticularField(
+                               task.id,
+                               updateETTitle.text.toString().trim(),
+                               updateETDesc.text.toString().trim()
+                           )
+                           .observe(this) {
+                               when (it.status) {
+                                   Status.LOADING -> {
+                                       loadingDialog.show()
+                                   }
+
+                                   Status.SUCCESS -> {
+                                       loadingDialog.dismiss()
+                                       if (it.data != -1) {
+                                           longToastShow("Task Updated Successfully")
+                                       }
+                                   }
+
+                                   Status.ERROR -> {
+                                       loadingDialog.dismiss()
+                                       it.message?.let { it1 -> longToastShow(it1) }
+                                   }
+                               }
+                           }
+                   }
+               }
+               updateTaskDialog.show()
+           }
         }
 
-        callGetTaskList()
+        mainBinding.taskRV.adapter = taskRecyclerViewAdapter
+
+        callGetTaskList(taskRecyclerViewAdapter)
 
 
     }
 
 
-    private fun callGetTaskList(){
+    private fun callGetTaskList(taskRecyclerViewAdapter: TaskRecyclerViewAdapter){
         CoroutineScope(Dispatchers.Main).launch{
         taskViewModel.getTaskList().collect{
             when(it.status){

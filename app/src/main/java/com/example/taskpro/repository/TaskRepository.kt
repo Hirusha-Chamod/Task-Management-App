@@ -53,4 +53,18 @@ class TaskRepository(application: Application) {
         }
     }
 
+
+
+    fun updateTaskPaticularField(taskId: String,title:String,description:String) = MutableLiveData<Resource<Int>>().apply {
+        postValue(Loading())
+        try {
+            CoroutineScope(Dispatchers.IO).launch {
+                val result = taskDao.updateTaskPaticularField(taskId, title, description)
+                postValue(Success(result))
+            }
+        }catch (e: Exception){
+            postValue(Error(e.message.toString()))
+        }
+    }
+
 }
