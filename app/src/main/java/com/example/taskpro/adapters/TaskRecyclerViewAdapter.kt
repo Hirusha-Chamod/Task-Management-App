@@ -1,5 +1,6 @@
 package com.example.taskpro.adapters
 
+import android.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ class TaskRecyclerViewAdapter(
         val titleTxt: TextView = itemView.findViewById(R.id.titleTxt)
         val descrTxt: TextView = itemView.findViewById(R.id.descrTxt)
         val dateTxt: TextView = itemView.findViewById(R.id.dateTxt)
+        val dueDateTxt: TextView = itemView.findViewById(R.id.dueDateTxt)
 
         val deleteBtn: ImageView = itemView.findViewById(R.id.deleteImg)
         val editImg : ImageView = itemView.findViewById(R.id.editImg)
@@ -53,12 +55,24 @@ class TaskRecyclerViewAdapter(
         val dateFormat = SimpleDateFormat("dd-MMM-yyyy HH:mm:ss a", Locale.getDefault())
 
         holder.dateTxt.text = dateFormat.format(task.date)
+        holder.dueDateTxt.text = dateFormat.format(task.dueDate)
 
-        holder.deleteBtn.setOnClickListener {
+        holder.deleteBtn.setOnClickListener { view ->
             if (holder.adapterPosition != -1) {
-                deleteUpdateCallback("delete",holder.adapterPosition, task)
+                val alertDialogBuilder = AlertDialog.Builder(view.context)
+                alertDialogBuilder.setTitle("Confirm Deletion")
+                alertDialogBuilder.setMessage("Are you sure you want to delete this item?")
+                alertDialogBuilder.setPositiveButton("Yes") { dialog, which ->
+                    deleteUpdateCallback("delete", holder.adapterPosition, task)
+                }
+                alertDialogBuilder.setNegativeButton("No") { dialog, which ->
+                    dialog.dismiss()
+                }
+                val alertDialog = alertDialogBuilder.create()
+                alertDialog.show()
             }
         }
+
 
         holder.editImg.setOnClickListener {
             if (holder.adapterPosition != -1) {

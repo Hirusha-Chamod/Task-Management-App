@@ -24,6 +24,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            android:textSize="20sp"
+            android:textColor="@color/black"
             android:text="Update Task"
             android:textStyle="bold" />
 
@@ -63,6 +65,7 @@
                     android:id="@+id/edTaskTitle"
                     android:layout_width="match_parent"
                     android:layout_height="?actionBarSize"
+                    android:textColor="@color/black"
                     android:inputType="text" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -80,10 +83,17 @@
                     android:background="#EAE4E8"
                     android:gravity="top|start"
                     android:inputType="textMultiLine"
+                    android:textColor="@color/black"
                     android:lines="3"
                     android:maxLines="3" />
 
             </com.google.android.material.textfield.TextInputLayout>
+            <DatePicker
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:textColor="@color/black"
+                android:calendarTextColor="@color/black"/>
 
             <Button
                 android:id="@+id/updateTaskBtn"
@@ -92,6 +102,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:backgroundTint="@color/black"
+                android:textColor="@color/white"
                 android:text="Update Task"/>
         </LinearLayout>
     </RelativeLayout>

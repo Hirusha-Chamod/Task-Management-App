@@ -4,7 +4,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.DatePicker
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -15,6 +17,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.taskpro.adapters.TaskRecyclerViewAdapter
 import com.example.taskpro.databinding.ActivityMainBinding
 import com.example.taskpro.models.Task
+import com.example.taskpro.models.getDateFromDatePicker
 import com.example.taskpro.utils.Status
 import com.example.taskpro.utils.clearEditText
 import com.example.taskpro.utils.longToastShow
@@ -73,6 +76,8 @@ class MainActivity : AppCompatActivity() {
 
         val addETTitle = addTaskDialog.findViewById<TextInputEditText>(R.id.edTaskTitle)
         val addETTitleL = addTaskDialog.findViewById<TextInputLayout>(R.id.edTaskTitleL)
+        val datePicker = addTaskDialog.findViewById<DatePicker>(R.id.date)
+
 
         addETTitle.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -107,12 +112,14 @@ class MainActivity : AppCompatActivity() {
             if (validateEditText(addETTitle, addETTitleL)
                 && validateEditText(addETDesc, addETDescL)
             ) {
+                val selectedDate = getDateFromDatePicker(datePicker)
                 addTaskDialog.dismiss()
                val newTask = Task(
                 UUID.randomUUID().toString().trim(),
                 addETTitle.text.toString().trim(),
                 addETDesc.text.toString().trim(),
-                Date()
+                Date(),
+                   selectedDate
                )
                 taskViewModel.insertTask(newTask).observe(this){
                      when(it.status){
@@ -156,6 +163,8 @@ class MainActivity : AppCompatActivity() {
 
         val updateETDesc = updateTaskDialog.findViewById<TextInputEditText>(R.id.edTaskDesc)
         val updateETDescL = updateTaskDialog.findViewById<TextInputLayout>(R.id.edTaskDescL)
+        val updateDatePicker = updateTaskDialog.findViewById<DatePicker>(R.id.date)
+
 
         updateETDesc.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
@@ -201,13 +210,8 @@ class MainActivity : AppCompatActivity() {
                    if (validateEditText(updateETTitle, updateETTitleL)
                        && validateEditText(updateETDesc, updateETDescL)
                    ) {
-                       val updateTask = Task(
-                           task.id,
-                           updateETTitle.text.toString().trim(),
-                           updateETDesc.text.toString().trim(),
-//                           here i Date updated
-                           Date()
-                       )
+                       val updateSelectedDate = getDateFromDatePicker(updateDatePicker)
+
                        updateTaskDialog.dismiss()
                        loadingDialog.show()
                        taskViewModel
@@ -215,7 +219,9 @@ class MainActivity : AppCompatActivity() {
                            .updateTaskPaticularField(
                                task.id,
                                updateETTitle.text.toString().trim(),
-                               updateETDesc.text.toString().trim()
+                               updateETDesc.text.toString().trim(),
+                               updateSelectedDate
+
                            )
                            .observe(this) {
                                when (it.status) {
@@ -246,7 +252,34 @@ class MainActivity : AppCompatActivity() {
 
         callGetTaskList(taskRecyclerViewAdapter)
 
+        callSearch()
 
+
+    }
+
+
+    private fun callSearch() {
+        mainBinding.edSearch.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun afterTextChanged(query: Editable) {
+                if (query.toString().isNotEmpty()){
+                    taskViewModel.searchTaskList(query.toString())
+                }else{
+                    taskViewModel.getTaskList()
+                }
+            }
+        })
+
+        mainBinding.edSearch.setOnEditorActionListener{ v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH){
+
+                return@setOnEditorActionListener true
+            }else{
+            false}
+        }
     }
 
 
@@ -274,4 +307,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         }
+
+
+
+
 }

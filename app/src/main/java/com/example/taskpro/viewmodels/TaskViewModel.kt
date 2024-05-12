@@ -8,6 +8,7 @@ import com.example.taskpro.models.Task
 import com.example.taskpro.repository.TaskRepository
 
 import com.example.taskpro.utils.Resource
+import java.util.Date
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -24,7 +25,13 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun updateTaskPaticularField(taskId: String,title:String,description:String): MutableLiveData<Resource<Int>> {
-        return taskRepository.updateTaskPaticularField(taskId, title, description)
+    fun updateTaskPaticularField(taskId: String,title:String,description:String,dueDate:Date): MutableLiveData<Resource<Int>> {
+        return taskRepository.updateTaskPaticularField(taskId, title, description,dueDate)
     }
+
+    fun searchTaskList(query: String) {
+        taskRepository.searchTaskList(query)
+    }
+
+
 }

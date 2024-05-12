@@ -26,6 +26,8 @@
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:text="New Task"
+            android:textSize="20sp"
+            android:textColor="@color/black"
             android:textStyle="bold" />
 
         <ImageView
@@ -63,6 +65,7 @@
                     android:id="@+id/edTaskTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/black"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -78,10 +81,20 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:gravity="top|start"
+                    android:textColor="@color/black"
                     android:lines="3"
                     android:maxLines="3" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            
+            <DatePicker
+                android:id="@+id/date"
+                android:layout_width="match_parent"
+                android:layout_height="350dp"
+                android:calendarTextColor="@color/black"
+                android:textColor="@color/black"
+                />
+            
             <Button
                 android:id="@+id/saveTaskBtn"
                 android:layout_width="wrap_content"
@@ -89,6 +102,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="8dp"
                 android:backgroundTint="@color/black"
+                android:textColor="@color/white"
                 android:text="Save Task" />
         </LinearLayout>
 

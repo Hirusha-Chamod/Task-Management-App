@@ -11,25 +11,60 @@
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:background="@drawable/task_bg"
       android:orientation="vertical">
 
-      <TextView
-          android:id="@+id/textView"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:text="Welcome Back"
-          android:textSize="24sp"
-          android:textStyle="bold"/>
 
-      <TextView
-          android:id="@+id/textView1"
-          android:layout_width="wrap_content"
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="120dp"
+          android:orientation="vertical"
+          android:background="@drawable/welcome_bg">
+
+          <TextView
+              android:id="@+id/textView"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:layout_marginTop="30dp"
+              android:text="Welcome Back"
+              android:textColor="@color/black"
+              android:textSize="24sp"
+              android:textStyle="bold" />
+
+          <TextView
+              android:id="@+id/textView1"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_gravity="center"
+              android:text="Today's Task"
+              android:textColor="@color/black"
+              android:textSize="24sp"
+              android:textStyle="bold" />
+      </LinearLayout>
+
+      <com.google.android.material.textfield.TextInputLayout
+          style="@style/SearchInputLayout"
+          android:id="@+id/edSearchL"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:text="Today's Task"
-          android:textSize="24sp"
-          android:textStyle="bold"/>
+          android:layout_marginTop="8dp"
+          android:layout_marginHorizontal="10dp"
+          app:startIconDrawable="@drawable/search_icon"
+          app:errorEnabled="false"
+          app:hintEnabled="false">
+
+          <com.google.android.material.textfield.TextInputEditText
+              android:id="@+id/edSearch"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="@color/white"
+              android:textColor="@color/black"
+              android:hint="Enter search title"
+              android:imeOptions="actionSearch"
+              android:inputType="text" />
+
+      </com.google.android.material.textfield.TextInputLayout>
 
       <androidx.recyclerview.widget.RecyclerView
           android:id="@+id/taskRV"
@@ -47,17 +82,18 @@
   </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-       android:id="@+id/addTaskFABtn"
+        android:id="@+id/addTaskFABtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="60dp"
         android:backgroundTint="@color/white"
         android:text="Add Task"
         android:textColor="@color/black"
         android:textStyle="bold"
         app:icon="@drawable/addbtn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Update
 import com.example.taskpro.models.Task
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 @Dao
 interface TaskDao {
@@ -25,6 +26,11 @@ interface TaskDao {
 
 
 
-    @Query("UPDATE Task SET taskTitle=:title, description = :description WHERE taskId = :taskId")
-    suspend fun updateTaskPaticularField(taskId:String,title:String,description:String): Int
+    @Query("UPDATE Task SET taskTitle=:title, description=:description, dueDate=:dueDate WHERE taskId=:taskId")
+    suspend fun updateTaskPaticularField(taskId: String, title: String, description: String, dueDate: Date): Int
+
+
+
+    @Query("SELECT * FROM Task WHERE taskTitle LIKE :query ORDER BY date DESC")
+    fun searchTaskList(query: String) : Flow<List<Task>>
 }
