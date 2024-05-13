@@ -1,6 +1,8 @@
 package com.example.taskpro.repository
 
 import android.app.Application
+import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import com.example.taskpro.dao.TaskDao
 import com.example.taskpro.database.TaskDatabase
@@ -12,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.PriorityQueue
 
 
 class TaskRepository(application: Application) {
@@ -68,14 +71,14 @@ class TaskRepository(application: Application) {
         }
     }
 
-    fun searchTaskList(query: String) = flow {
-        emit(Loading()) // Emit loading state
-
+    fun searchTaskList(query: String,application: Application) = flow {
+        emit(Loading())
         try {
-            val result = taskDao.searchTaskList("%$query%")
-            emit(Success(result)) // Emit success state with the search results
+            Toast.makeText(application,"Searching from repo",Toast.LENGTH_SHORT).show()
+            val result = taskDao.searchTaskList(query)
+            emit(Success(result))
         } catch (e: Exception) {
-            emit(Error(e.message.toString())) // Emit error state if an exception occurs
+            emit(Error(e.message.toString()))
         }
     }
 

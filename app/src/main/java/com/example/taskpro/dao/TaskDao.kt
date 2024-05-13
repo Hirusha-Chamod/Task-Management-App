@@ -1,5 +1,6 @@
 package com.example.taskpro.dao
 
+import android.app.Application
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -31,6 +32,8 @@ interface TaskDao {
 
 
 
-    @Query("SELECT * FROM Task WHERE taskTitle LIKE :query ORDER BY date DESC")
-    fun searchTaskList(query: String) : Flow<List<Task>>
+    @Query("SELECT * FROM Task WHERE taskTitle = :query")
+    fun searchTaskList(query: String): Flow<List<Task>>
+
+
 }

@@ -29,7 +29,7 @@ abstract class TaskDatabase : RoomDatabase() {
                     TaskDatabase::class.java,
                     "task_db"
                 )
-                    .fallbackToDestructiveMigration() // This will recreate the database on version mismatch
+                    .fallbackToDestructiveMigration()
                     .build()
                     .also {
                         INSTANCE = it

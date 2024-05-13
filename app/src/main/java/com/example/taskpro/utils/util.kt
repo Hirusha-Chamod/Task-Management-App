@@ -2,6 +2,8 @@ package com.example.taskpro.utils
 
 import android.app.Dialog
 import android.content.Context
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
@@ -43,4 +45,13 @@ fun validateEditText(editText: EditText, textTextInputLayout: TextInputLayout): 
 fun clearEditText(editText: EditText, textTextInputLayout: TextInputLayout) {
     editText.text = null
     textTextInputLayout.error = null
+}
+
+fun Context.hideKeyBoard(view : View){
+    try {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken,0)
+    }catch (e: Exception){
+        e.printStackTrace()
+    }
 }

@@ -2,12 +2,16 @@ package com.example.taskpro.viewmodels
 
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import com.example.taskpro.dao.TaskDao
+import com.example.taskpro.database.TaskDatabase
 import com.example.taskpro.models.Task
 import com.example.taskpro.repository.TaskRepository
 
 import com.example.taskpro.utils.Resource
+import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 class TaskViewModel(application: Application) : AndroidViewModel(application) {
@@ -29,9 +33,12 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
         return taskRepository.updateTaskPaticularField(taskId, title, description,dueDate)
     }
 
-    fun searchTaskList(query: String) {
-        taskRepository.searchTaskList(query)
-    }
+    fun searchTaskList(query: String,application: Application): Flow<List<Task>> {
 
+        val taskDao: TaskDao = TaskDatabase.getInstance(application).taskDao
+        Toast.makeText(application, "Search from view model " + query, Toast.LENGTH_SHORT).show()
+        return taskDao.searchTaskList(query)
+
+    }
 
 }

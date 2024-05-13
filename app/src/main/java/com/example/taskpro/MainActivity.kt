@@ -18,8 +18,10 @@ import com.example.taskpro.adapters.TaskRecyclerViewAdapter
 import com.example.taskpro.databinding.ActivityMainBinding
 import com.example.taskpro.models.Task
 import com.example.taskpro.models.getDateFromDatePicker
+import com.example.taskpro.repository.TaskRepository
 import com.example.taskpro.utils.Status
 import com.example.taskpro.utils.clearEditText
+import com.example.taskpro.utils.hideKeyBoard
 import com.example.taskpro.utils.longToastShow
 import com.example.taskpro.utils.setupDialog
 import com.example.taskpro.utils.validateEditText
@@ -31,8 +33,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 import java.util.UUID
+import java.util.concurrent.Flow
 
 class MainActivity : AppCompatActivity() {
+
+    var myTaskList:List<Task> = listOf()
+    lateinit var taskRecyclerViewAdapter: TaskRecyclerViewAdapter
 
     private val mainBinding: ActivityMainBinding by lazy {
         ActivityMainBinding.inflate(layoutInflater)
@@ -181,7 +187,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-       val taskRecyclerViewAdapter = TaskRecyclerViewAdapter(){type,position, task ->
+        taskRecyclerViewAdapter = TaskRecyclerViewAdapter(){type,position, task ->
            if (type =="delete"){
             taskViewModel.deleteTask(task).observe(this){
                 when(it.status){
@@ -249,39 +255,45 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainBinding.taskRV.adapter = taskRecyclerViewAdapter
-
+        callSearch()
         callGetTaskList(taskRecyclerViewAdapter)
 
-        callSearch()
+
 
 
     }
 
+    private fun filterTasks(query: String, taskRecyclerViewAdapter: TaskRecyclerViewAdapter) {
+        val filteredTasks = if (query.isEmpty()) {
+            myTaskList // Show all tasks if query is empty
+        } else {
+            myTaskList.filter { task ->
+                task.title.contains(query, ignoreCase = true) || task.description.contains(query, ignoreCase = true)
+            }
+        }
+        // Update RecyclerView with filtered tasks
+        taskRecyclerViewAdapter.addAllTask(filteredTasks)
+    }
 
     private fun callSearch() {
-        mainBinding.edSearch.addTextChangedListener(object : TextWatcher{
+        mainBinding.edSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun afterTextChanged(query: Editable) {
-                if (query.toString().isNotEmpty()){
-                    taskViewModel.searchTaskList(query.toString())
-                }else{
-                    taskViewModel.getTaskList()
-                }
+                filterTasks(query.toString(),taskRecyclerViewAdapter)
             }
         })
 
-        mainBinding.edSearch.setOnEditorActionListener{ v, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH){
-
+        mainBinding.edSearch.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                hideKeyBoard(mainBinding.edSearch)
                 return@setOnEditorActionListener true
-            }else{
-            false}
+            }
+            false
         }
     }
-
 
     private fun callGetTaskList(taskRecyclerViewAdapter: TaskRecyclerViewAdapter){
         CoroutineScope(Dispatchers.Main).launch{
@@ -292,8 +304,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 Status.SUCCESS->{
                     it.data?.collect{taskList->
+                        myTaskList  = taskList
                         loadingDialog.dismiss()
-                        taskRecyclerViewAdapter.addAllTask(taskList)
+                        taskRecyclerViewAdapter.addAllTask(myTaskList)
                     }
 
                 }
